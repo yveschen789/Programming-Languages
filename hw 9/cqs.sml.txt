@@ -1,0 +1,313 @@
+1. Using one of the sources in the [ML learning guide](../readings/ml.html),
+    read about structures, signatures, and matching.  Then answer
+    questions about the structure and signature below.
+
+    The following structure contains definitions that should be
+    familiar from the [ML homework](ml.html) and from code you may
+    have seen in the course interpreters:
+
+        structure ExposedEnv = struct
+          type name   = string
+          type 'a env = (name * 'a) list
+          exception NotFound of name
+          val emptyEnv = []
+
+          fun lookup (name, [])              = raise NotFound name
+            | lookup (name, (x, v) :: pairs) =
+                if x = name then v else lookup (name, pairs)
+
+          fun bindVar (name, value, env) = (name, value) :: env
+        end
+
+    Here is a signature:
+
+        signature ENV = sig
+          type name = string
+          type 'a env
+          val emptyEnv : 'a env
+          val lookup   : name * 'a env -> 'a
+          val bindVar  : name * 'a * 'a env -> 'a env
+        end
+
+    Answer these questions:
+
+    (a) Does the structure match the signature?  That is, if we write
+
+            structure Env :> ENV = ExposedEnv
+
+        does the resulting code typecheck?  Please answer yes or no.
+
+        Yes
+
+    (b) Does the signature expose enough information for us to write
+        the following function?  Please answer yes or no.
+
+            fun extendEnv (names, vals, rho) =
+              ListPair.foldrEq Env.bindVar rho (names, vals)
+
+          Yes
+
+    (c) Does the signature expose enough information for us to write
+        the following function?  Please answer yes or no.
+
+            fun isBound (name, rho) = (Env.lookup (name,rho) ; true) 
+                                      handle Env.NotFound _ => false
+
+          No because Env.NotFound is unbound
+
+
+    (d) If in part (b) or part (c), if it is not possible to write the
+        function given, change the signature to make it possible.
+        If necessary, please copy, paste, and edit your new version in
+        here:
+
+
+
+        Add `exception NotFound of name` in the `ENV` signature
+
+
+    (e) Suppose I change the `ENV` signature to make the `name` type
+        abstract, so the code reads
+
+            signature ENV' = sig
+              type name
+              type 'a env
+              val emptyEnv : 'a env
+              val lookup   : name * 'a env -> 'a
+              val bindVar  : name * 'a * 'a env -> 'a env
+            end
+            structure Env' :> ENV' = ExposedEnv
+
+        The new structure `Env'`, sealed with signature `ENV'`, is useless.
+        Please explain *why* it is useless:
+
+        It is already assigned previously to a different signature
+
+
+    *You now have the basic ideas needed to understand what is being
+    asked of you in this assignment.*
+
+
+ 2. An ML _functor_ is a function that operates on the module level.
+    Think of it as a "module in waiting" or a "module builder";
+    a software engineer would call it a "generic module."
+    A functor's _formal_ parameters, if any, are specified by a
+    _sequence of declarations_, and its _actual_ parameters are given
+    by a _sequence of definitions_.  A functor's _result_ is a
+    structure.
+    
+    Read about functors in Harper, as recommended in the ML learning
+    guide.  Then read about structure matching in section 24 of
+    Tofte's "Tips for Computer Scientists on Standard ML."
+    Then answer the questions below.
+    
+    (a) On page 183, Harper defines a functor `DictFun` which takes
+        one parameter: a structure `K` matching signature `ORDERED`.
+        A dictionary is implemented using a binary tree.  Suppose
+        instead you want to implement a dictionary using a hash table.
+        So you define a new functor `HashDictFun`, and it expects one
+        parameter: a structure `K` with signature `HASHABLE`:
+
+            functor HashDictFun(structure K : HASHABLE) :>
+                      MUTABLE_DICT where type Key.t = K.t
+              =
+            struct
+              ... imagine your beautiful hash table here ...
+            end
+
+        The new signature `HASHABLE` is analogous to Harper's
+        signature `ORDERED`: it defines a key type `t`, plus every thing
+        we need to know *about keys* to build a generic hash table with
+        elements of type `t`.
+
+        Fill in the complete definition of signature `HASHABLE` here:
+        
+            signature HASHABLE = sig
+              structure Key : ORDERED = K
+                datatype ’a dict =
+                Empty |
+                Node of ’a dict * Key.t * ’a * ’a dict
+            end
+            
+
+    (b) For each component of your `HASHABLE` signature, whether it is
+        a type component or a value component, say what you expect it
+        to be used for in functor `HashDictFun`.
+        _Write only English_, not code:
+
+        >Key is type component
+          dict is value component
+
+
+    (c) Suppose you have a structure `IntHash` that matches signature
+
+            HASHABLE where type t = int
+            
+        Now suppose you apply function `DictFun`, from Harper's
+        chapter, to structure `IntHash`.  This scenario is like the 
+        examples on the bottom of page 184; I'm suggesting you try
+        
+            structure HIntDict = DictFun (structure K = IntHash).
+
+        What will the ML compiler say?  Will it reject this
+        application of DictFun or accept it?
+
+          - If the compiler would reject the application, say one
+            *specific* thing the compiler would complain about:
+            
+            >  it does not specify where type Key.t = K.t
+            
+          - If the compiler would accept the application, explain why
+            the compiler would be OK with it even though the functor expects
+            module `K` with signature `ORDERED` and you are giving it
+            module `K` with signature `HASHABLE`:
+
+            > structure K will be referred all the way to the top as a 
+            HashDictFun component so it is okay
+
+    *You now understand functors well enough to use them in exercises H and I.*
+
+ 3. Read about "signature refinement or specialization" in the
+    [ML learning guide](../readings/ml.pdf).  Now,
+
+    (a) In Harper's `DictFun` functor, explain what is going
+        on with the `where type` syntax.
+
+        The implementation of dictionaries is the same as as order
+        structure on keys and binds the definition to the other implementation
+
+    (b) Explain what would go wrong if Harper wrote a definition
+        _without_ `where type`:
+
+            functor DictFun (structure K : ORDERED) :> DICT
+              =
+            struct
+              ...
+            end
+
+          The implementation would not understand what to do with K
+          dot functions and complain to the interpreter.
+
+    *You now know enough to use functors in exercises H and I.*
+
+ 4. Read about abstraction functions and invariants in the lesson
+    ["Program design with abstract data types"](../design/lessons.pdf).
+    Then, from the ML homework, review the algebraic data type from
+    the [natural-number problems](./ml.html#nat).
+
+    Now answer these questions:
+    
+    (a) The lesson describes a sorted list as one possible
+        representation for a set.  Define a function `invariant` that
+        takes as argument a list of integers and returns a Boolean
+        saying if the list is sorted in strictly ascending order
+        (that is, increasing, with no repeats).  You may use ML or
+        μScheme, and you may reuse any function assigned for homework
+        this term:
+        
+
+        fun sort [] = []
+          | sort (e::es) =
+            let
+                fun populateheap (elist, myheap) =
+                    case elist of [] => myheap
+                                | (g::gs) =>
+                                    let
+                                        val newheap = Q.insert (g , myheap)
+                                    in
+                                        populateheap(gs, newheap)
+                                    end
+
+                fun sorthelper (eheap) =
+                    let
+                      val (myelem, newheap) = Q.deletemin eheap
+                    in
+                      myelem::(sorthelper newheap)
+                    end
+
+                val newheap = populateheap(e::es, Q.empty)
+           in
+                sorthelper newheap
+           end
+
+
+          (*sorts the list and zips it with old list before checking that
+          every pair in zipped list matches*)
+
+           fun execute mylist =
+              let
+                zippedlist = List.zip (sort mylist) mylist
+              in
+                foldr (fn (v, a) => if (fst v) = (snd v) then a else #f) 
+                                                    #t zippedlist
+
+
+        
+
+    (b) In the ML homework, the algebraic type `nat` satisfies two
+        invariants.  In ML, define a function `invariant` of type
+        `nat -> bool`, which returns true if and only if the given
+        representation satisfies both invariants:
+    
+        fun invariant ZERO = true
+                      | invariant (DTIMES8 (n, d)) = if d < 8 then invariant n 
+                      else false
+
+    *You are now ready to write abstraction functions and invariants
+    in exercises I, N, and ADT.*
+
+ 5. Read about short division starting on page 593 of the book,
+    and in ["Mastering Multiprecision Arithmetic"](../readings/arithmetic.pdf).
+
+    (a) Divide 2918 by 7, calculating both quotient and remainder.  
+        At each step, you divide a two-digit number by 7.  The
+        remainder is passed along to form the next two-digit number.
+
+              _________
+            7 | 2 9 1 8
+
+        At each step of the computation, you will take a two-digit
+        dividend, divide by 7, and give quotient and remainder.
+        The first step is
+
+              02 divided by 7  ==  0 remainder 2
+              29 divided by 7  ==  4 remainder 1
+              11 divieded by 7 == 1 remainder 4
+              48 divided by 7 is 6 remainder 6
+
+        There are four steps in total.  Edit the text above to state
+        the dividend, divisor, quotient, and remainder at each step.
+        Here, write the final four-digit quotient and the one-digit
+        remainder:
+           
+    *You are now ready to implement short division on natural numbers
+    (for exercise N).*
+
+
+ 6. Going back to the same reading, and following the examples in the
+    section "Using short division for base conversion," convert a
+    number from decimal to binary and another number from decimal to octal.
+
+    (a) Using repeated division by 2, convert decimal 13 to binary.
+        The ["Mastering Multiprecision Arithmetic"](../readings/arithmetic.pdf)
+        handout shows the form, so please just fill in the right-hand
+        sides here: 
+
+              q0 = 6          r0 = 1
+              q1 = 3          r1 = 0
+              q2 = 1          r2 = 1
+              q3 = 0          r3 = 1
+
+        Now write the converted numeral here: 
+
+    (b) Using repeated division by 8, convert decimal 25 to octal 31.
+        Follow the same model: at each step, give the intermediate
+        quotient and remainder, and then form the final quotient by
+        reading off the remainders.
+
+          q0 = 3      r0 = 1
+          q1 = 0      r1 = 3
+
+    *You are now ready to implement the `decimal` operation on natural
+    numbers (for exercise N).  This will also enable you to implement
+    the `toString` operation on signed integers.*

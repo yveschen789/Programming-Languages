@@ -1,0 +1,20 @@
+;; Yves Chen
+;; Hw2 OpSem
+;; awk-icon.imp
+;; prints lastly 1 in awk interpreter and prints lastly 0 in icon interpreter
+
+;; awk will remember setting x to 1, icon will do it locally and forget after
+;; function terminates
+(define set_val ()
+    (set x 1))
+
+;; spits out x, awk will remember x was set to 1 since x was defined as global
+;; icon will see x and not know it was previously set to 1 as a formal 
+;; parameter and will set x as 0 locally and print that
+(define out_val ()
+    x)
+
+
+;;calling functions
+(set_val)
+(out_val)

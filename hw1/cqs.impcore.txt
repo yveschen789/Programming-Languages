@@ -1,0 +1,102 @@
+Please read pages 14--22 in *Programming Languages: Build, Prove, and Compare*.
+
+1.  What is the value of the following Impcore expression?
+
+        (if (> 3 5) 17 99)
+
+        99
+
+2.  Which of the following best describes the syntactic structure of
+    Impcore?
+
+    (a)   An expression can be made with any definition as one of its parts
+    (b)   A definition can be made with any expression as one of its parts
+    (c)   Both of the above
+    (d)   None of the above
+
+    (b)
+
+3.  Does the following Impcore test pass? Please answer "yes" or "no."
+
+        (check-expect (+ 1 2 3) 6)
+
+        no
+
+    Assuming `x` is bound to a global variable, does the following
+    Impcore test pass? Again, please answer "yes" or "no."
+
+        (check-expect (set x 1) 1)
+
+        yes
+
+Next read section 1.2, which starts on page 25, about abstract syntax.
+
+4.  After reading about abstract syntax, look at this picture of an
+    abstract-syntax tree for a "calculator expression":
+
+    ![Picture of an abstract-syntax tree](ast.jpg) 
+
+    Answer these questions:
+
+    (a) What concrete syntax could you write in C for this expression?
+
+    9 - 12 / 3
+
+    (b) What concrete syntax could you write in Impcore for this expression?
+
+    (- 9 (/ 12 3))
+
+In *Seven Lessons in Program Design*, at
+<https://www.cs.tufts.edu/comp/105/design/lessons.pdf>, read the
+Introduction and Lesson 1.
+
+5.  I show you a recursive function `f` that takes one argument, 
+    a natural number `n`.  The structure of `n`, and therefore the
+    internal structure of `f`, are based on the Peano proof system from
+    the handout.
+
+    (a) What are the different ways `n` can be formed?
+
+    n = (m + 1)
+    n = 0
+
+    (b) When `f` is given `n`, what code do you expect `f` to use to
+        determine how `n` was formed?
+
+    (- n 1)
+
+    (c) For which values of `n` do you expect `f` to make a recursive call?
+
+    n > 0
+
+    (d) When a recursive call is made, what value is passed as argument?
+
+    (- n 1)
+
+
+Read the expectations about contracts in the [*course coding
+guidelines*](../coding-style.html#contracts).
+
+6.  Suppose I write a contract for a `power` function that says, "this
+    function multiplies $x$ by itself $n$ times."  According to our
+    expectations, is this a good contract or a bad contract?
+    Please answer "good" or "bad."
+
+    good
+
+7.  In *Seven Lessons in Program Design*, just before the end of
+    Lesson 1, you will find a section on "Complete process examples."
+    This section suggests that the `factorial` function---but not the
+    `power` function---could be submitted without a contract.
+    
+    (a) Why would it be OK to submit the `factorial` function without
+        a contract?  For an idea, look at the "Exemplary" column in
+        the "Documentation" section of the general coding rubric.
+
+        the definition of the function is self-explained by its title
+
+    (b) Why doesn't the same argument apply to the `power` function?
+        For an idea, check the design lesson.
+
+        This function takes multiple args and therefore needs to specify
+        how each arg is evaluated and how the function returns a value

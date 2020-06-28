@@ -1,0 +1,145 @@
+Yves Chen
+OpSem Part 1
+cqs.opsem.txt
+
+For questions 1--7, please read pages 26--34 (the book sections on
+environments and on operational semantics of expressions).
+These questions are multiple-choice.  Questions 1 to 3 offer one set
+of choices, and questions 4 to 6 offer another set of choices.
+
+ 1. $\xi$ is an environment that maps names to
+
+    (a) *only* user-defined functions.
+    (b) *only* the values of formal parameters.
+    (c) *both* primitive and user-defined functions.
+    (d) the values of *both* global variables and formal parameters.
+    (e) *only* primitive functions.
+    (f) *only* the values of global variables.
+
+    (f)
+
+
+ 2. $\phi$ is an environment that maps names to
+
+    (a) *only* user-defined functions.
+    (b) *only* the values of formal parameters.
+    (c) *both* primitive and user-defined functions.
+    (d) the values of *both* global variables and formal parameters.
+    (e) *only* primitive functions.
+    (f) *only* the values of global variables.
+
+    (c)
+
+ 3. $\rho$ is an environment that maps names to
+
+    (a) *only* user-defined functions.
+    (b) *only* the values of formal parameters.
+    (c) *both* primitive and user-defined functions.
+    (d) the values of *both* global variables and formal parameters.
+    (e) *only* primitive functions.
+    (f) *only* the values of global variables.
+
+    (b)
+
+ 4. In the operational semantics, what kind of a thing does the
+    metavariable $e$ stand for?
+
+    (a) an environment
+    (b) an Impcore variable
+    (c) an elaboration
+    (d) an expression
+    (e) a value
+    (f) a function
+
+    (d)
+
+ 5. In the operational semantics, what kind of a thing does the
+    metavariable $v$ stand for?
+
+    (a) an environment
+    (b) an Impcore variable
+    (c) an elaboration
+    (d) an expression
+    (e) a value
+    (f) a function
+
+    (e)
+
+ 6. In the operational semantics, what kind of a thing does the
+    phrase $\rho\{x \mapsto 7\}(x)$ stand for?
+
+    (a) an environment
+    (b) an Impcore variable
+    (c) an elaboration
+    (d) an expression
+    (e) a value
+    (f) a function
+
+    (c)
+
+ 7. In the operational semantics, what kind of a thing does the
+    phrase $\rho\{x \mapsto 7\}\{x \mapsto 8\}$ stand for?
+
+    (a) an environment
+    (b) an Impcore variable
+    (c) an elaboration
+    (d) an expression
+    (e) a value
+    (f) a function
+
+    (c)
+
+Questions 8 and 9 are also based on
+pages 26--34.
+Please answer a number.
+
+ 8. How many rules have the IF syntactic form in the conclusion?
+
+    2
+
+ 9. How many rules have the APPLY syntactic form in the conclusion?
+    (Look at all the rules in the section, not just the
+    summary on page 77.)
+
+    1
+
+Now let's understand a subtle point about rules. Study the FormalVar
+and FormalAssign rules starting on page 30.  In FormalVar, the initial
+and final states have the same $\rho$.  But in the FormalAssign rule,
+there is an initial state with $\rho$, an intermediate state with
+$\rho'$, and a final state with $\rho'\{x \mapsto v\}$.  Answer these
+questions:
+
+10. In rule FormalVar, the initial and final state have the same $\rho$ because
+
+    (a) Evaluating $x$ might change the value of some formal parameter.
+    (b) Evaluating $x$ might not change the value of any formal parameter.
+    (c) Evaluating $x$ doesn't change the value of any formal parameter.
+
+    (c)
+      
+11. In rule FormalAssign, there is an intermediate state with $\rho'$
+    (rho-prime) because
+
+    (a) Evaluating $e$ might change the value of some formal parameter.
+    (b) Evaluating $e$ might not change the value of any formal parameter.
+    (c) Evaluating $e$ doesn't change the value of any formal parameter.
+
+    (a)
+
+When a rule is used in a derivation, it doesn't look exactly the way
+it looks in isolation.  Regrettably, section 1.6.1, which starts on page 54 
+does not really explain how to construct a derivation.  But look at
+the example derivation on page 56, and
+answer this question:
+
+12. The same $\rho$ is used throughout the derivation because
+
+    (a) Every subexpression is known, and because there is no unknown
+        subexpression, there is no need for a $\rho'$ (rho-prime).
+    (b) No part of the evaluation changes the value of a formal parameter.
+    (c) The example derivation takes a shortcut and doesn't actually
+        conform to the rules.
+
+    (a)
+    

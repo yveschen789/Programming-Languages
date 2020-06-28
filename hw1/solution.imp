@@ -1,0 +1,238 @@
+;;;;;;;;;;;;;;;;;;; COMP 105 IMPCORE ASSIGNMENT ;;;;;;;;;;;;;;;
+;; Name: Yves Chen
+;; UTLN: ychen22
+;; Comp105 Assignment 1: Impcore
+;; File solution.imp
+;; Purpose: Impcore solutions
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;
+;;;;  Exercise L10
+
+
+;; (log10 m) <finds smallest integer k, where 10 to the power of k+1 is
+;; greater than m>
+
+;; laws:
+;;   (log10 (+ (* 10 0) d)) == 0 
+;;   (log10 (+ (* 10 m) d)) == (+ (log10 (/ m 10)) 1)
+;; [2 cases, d does not matter]
+
+(define log10 (m)
+    (if (= (/ m 10) 0)
+        0
+        (+ (log10 (/ m 10)) 1)))
+
+        (check-expect (log10 9) 0)
+        (check-expect (log10 100) 2)
+        (check-expect (log10 12345) 4)
+        (check-expect (log10 9999) 3)
+
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;
+;;;;  Exercise DD
+
+
+;; (double-digit n) <copies each digit in n and and inserts the doubled 
+;; digit after the copied digit, returning the altered number>
+
+;; laws:
+;;   (double-digit (+ (* 10 0) d)) == (+ (* 10 d) d)
+;;   (double-digit (+ (* 10 m) d)) == (+ (* (double-digit m) 100) (+ (* 10 d)
+;;   d))
+
+
+(define double-digit (n)
+    (if (= (/ n 10) 0)
+        (+ (* 10 (mod n 10)) (mod n 10))
+        (+ (* (double-digit (/ n 10)) 100) (+ (* 10 (mod n 10)) (mod n 10)))))
+
+
+        (check-expect (double-digit 12) 1122)
+        (check-expect (double-digit 1245) 11224455)
+
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;
+;;;;  Exercise C
+
+
+;; (population-count n) <returns the number of 1 bits in a binary 
+;; representation of a non-negative integer> 
+
+;; laws:
+;;   (population-count (+ (* 2 m) 0)) == (+ (population-count (/ m 2)) 0)
+;;   (population-count (+ (* 2 m) 1)) == (+ (population-count (/ m 2)) 1)
+;;   (population-count (+ (* 2 0) b)) == b
+
+
+(define population-count (n)
+    (if (= 0 (/ n 2))
+        (mod n 2)
+        (if (= 1 (mod n 2))
+            (+ (population-count (/ n 2)) 1)
+            (population-count (/ n 2)))))
+
+     (check-expect (population-count 9) 2)
+     (check-expect (population-count 82) 3)
+     (check-expect (population-count 20) 2)
+     (check-expect (population-count 18) 2)
+     (check-expect (population-count 56435) 10)
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;
+;;;;  Exercise 8
+
+
+;; (binary n) <checks if n is negative and sends natural number as
+;; parameter to binaryHelper>
+
+;; (binaryHelper m) <translates a decimal representation m to a binary
+;; representation and returns that>
+
+;; laws:
+;;   (binaryHelper (+ (* 2 m) 0)) == (+ (* 10 (binary-Helper (/ m 2))) 0)
+;;   (binaryHelper (+ (* 2 m) 1)) == (+ (* 10(binary-Helper (/ m 2))) 1)
+;;   (binaryHelper (+ (* 2 0) b)) == b
+
+
+(define binary (n)
+    (if (> 0 n)
+        (* -1 (binaryHelper (* n -1)))
+        (binaryHelper n)))
+
+(define binaryHelper (m)
+    (if (= 0 (/ m 2))
+        (mod m 2)
+        (if (= 1 (mod m 2))
+            (+ (* 10 (binaryHelper (/ m 2))) 1)
+            (* 10 (binaryHelper (/ m 2))))))    
+
+        (check-expect (binary 82) 1010010)
+        (check-expect (binary 9) 1001)
+        (check-expect (binary 564) 1000110100)
+        (check-expect (binary -5) -101)
+        (check-expect (binary -82) -1010010)
+        (check-expect (binary 0) 0) 
+
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;
+;;;;  Exercise 3
+
+
+;; (log b n) <returns smallest int n s.t. "b^(n+1) > m"> 
+
+;; laws:
+;;   (log b (+ (* b m) d)) == (+ (log b ((b-1) * m)) 1)
+;;   (log b (+ (* 0 m) d)) == 0
+;; code is based off L10
+
+(define log (b n)
+    (if (= (/ n b) 0)
+        0
+        (+ (log b (/ n b)) 1)))
+
+
+        (check-expect (log 9 9) 1)
+        (check-expect (log 81 9) 0)
+        (check-expect (log 2 9) 3)
+        (check-expect (log 5 125) 3)
+        (check-expect (log 5 126) 3)
+        (check-expect (log 8 12071) 4)
+
+
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;
+;;;;  Exercise 2
+
+
+;; (sigma m n) <return m + (m+1) + ...+ n> 
+
+;; laws:
+;;   (sigma m (+ m d)) == (+ m (sigma ((+ m 1) (+ m d))))
+;;   (sigma m  (+ m 0)) == m
+
+(define sigma (m n)
+    (if (= m n)
+        m
+        (+ m (sigma (+ m 1) n))))
+
+
+        ;; replace next line with good check-expect or check-assert tests
+        (check-expect (sigma 9 9) 9)
+        (check-expect (sigma 4 9) 39)
+        (check-expect (sigma 334 455) 48129)
+        (check-error (sigma 534 455)) ;;gives error
+
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;
+;;;;  Exercise 5
+
+
+;; (prime? n) <checks if n is less than 2 and calls primeHelper? if not>
+
+;; (primeHelper? (m n)) <recursively reduces m and checks if n is divisible
+;; by any of m's values: If true return false, else if m reduces to 1 ret 1> 
+
+;; laws:
+;;   (primeHelper? 1 n) == 1
+;;   (primeHelper? (/ n b) n) == 0
+;;   (primeHelper? (+ (/ n b) d) n) == (primeHelper? (- m 1) n)
+
+(define primeHelper? (m  n)
+    (if (= m 1)
+        1
+        (if (= (mod n m) 0)
+            0
+            (primeHelper? (- m 1) n))))
+
+
+(define prime? (n)
+    (if (< n 2)
+        0
+        (primeHelper? (- n 1) n)))
+
+
+        (check-expect (prime? 9) 0)
+        (check-expect (prime? 51) 0)
+        (check-expect (prime? 97) 1)
+        (check-expect (prime? 991) 1)
+        (check-expect (prime? 990) 0)
+
+
+
+;; (nthprime n) <calls nthPrimerHelper to find nth prime number> 
+
+;; (nthprimeHelper (n m)) <subtracts 1 from n every time m is prime adding 1
+;; to m until n is 1 and m is prime again and returns m>
+
+;; laws:
+;;   (nthprimeHelper 1 prime(m)) == m
+;;   (nthprimeHeler n prime(m)) == (nthprimeHelper (- n 1) (+ m 1))
+;;   (nthprimeHeler n !prime(m)) == (nthprimeHelper n (+ m 1))
+
+(define nthprime (n)
+    (nthprimeHelper n  2))
+
+(define nthprimeHelper (n m)
+    (if (and (= n 1) (prime? m))
+        m
+        (if (prime? m)
+            (nthprimeHelper (- n 1) (+ m 1))
+            (nthprimeHelper n (+ m 1)))))
+
+
+        
+        (check-expect (nthprime 15) 47)
+        (check-expect (nthprime 5) 11)
+        (check-expect (nthprime 11) 31)
